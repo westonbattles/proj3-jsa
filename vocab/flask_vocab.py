@@ -80,13 +80,15 @@ def check():
 
 
     """
+    JSON HANDLING (for me to remember later): 
+
     inputs:
     "text": just the form text
 
     outputs:
     "response_message": response message
-    "matches": the list of matches we have (so my code knows what to display instead of using flask flashing)
     "redirect_url": redirect url, i think putting this here makes sense
+    "match": only added to response json if the word was a match (and match will be set to that word if there was)
     """
 
     """
@@ -116,15 +118,14 @@ def check():
         # Cool, they found a new word
         matches.append(text)
         flask.session["matches"] = matches
-        response["match"] = text
+        response["match"] = text # add the matched word to our respond json
+
+    # if we did not find a new match, update our response message accordingly
     elif text in matches:
-        #flask.flash("You already found {}".format(text))
         response["response_message"] = "You already found {}".format(text)
     elif not matched:
-        #flask.flash("{} isn't in the list of words".format(text))
         response["response_message"] = "{} isn't in the list of words".format(text)
     elif not in_jumble:
-        #flask.flash('"{}" can\'t be made from the letters {}'.format(text, jumble))
         response["response_message"] = '"{}" can\'t be made from the letters {}'.format(text, jumble)
 
     else:
@@ -133,14 +134,12 @@ def check():
 
     # Choose page:  Solved enough, or keep going?
     if len(matches) >= flask.session["target_count"]:
-       #return flask.redirect(flask.url_for("success"))
+       # add the success url to our json response, so our js knows when and where to send us after succeeding
        response["redirect_url"] = flask.url_for("success")
 
+    # send our json!!!
     return flask.jsonify(result = response)
 
-
-
-# https://stackoverflow.com/a/22271229
 
 ###############
 # AJAX request handlers
