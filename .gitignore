@@ -1,0 +1,6 @@
+vocab/__pycache__/
+
+vocab/flask_minijax.py
+vocab/templates/minijax.html
+
+vocab/credentials.ini
