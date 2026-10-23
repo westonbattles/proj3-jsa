@@ -85,6 +85,7 @@ def check():
 
     outputs:
     "response_message": response message
+    "matches": the list of matches we have (so my code knows what to display instead of using flask flashing)
     "redirect_url": redirect url, i think putting this here makes sense
     """
 
@@ -115,6 +116,7 @@ def check():
         # Cool, they found a new word
         matches.append(text)
         flask.session["matches"] = matches
+        response["match"] = text
     elif text in matches:
         #flask.flash("You already found {}".format(text))
         response["response_message"] = "You already found {}".format(text)
@@ -133,9 +135,6 @@ def check():
     if len(matches) >= flask.session["target_count"]:
        #return flask.redirect(flask.url_for("success"))
        response["redirect_url"] = flask.url_for("success")
-    else:
-       #return flask.redirect(flask.url_for("keep_going"))
-       response["redirect_url"] = flask.url_for("keep_going")
 
     return flask.jsonify(result = response)
 

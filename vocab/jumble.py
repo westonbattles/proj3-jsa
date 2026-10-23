@@ -26,6 +26,7 @@ def jumbled(word_list, n):
        (i.e., duplicates between words have been removed).
     """
     selected = random.sample(word_list, n)
+    print(f"selected: {selected}")
     bag = LetterBag("")
     for word in selected:
         bag.merge(LetterBag(word))

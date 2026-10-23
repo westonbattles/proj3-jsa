@@ -88,10 +88,14 @@
 </div></div>
 
 <script>
+
+
 // Suppress normal form submission
 $("#entry").submit( function(event) {
    event.preventDefault();
   });
+
+  
 
 
 // On each keystroke, ask the server whether the current 
@@ -109,37 +113,59 @@ $("#attempt").keyup(function(event) {
    var keycode = event.which;      // They key that just went up
    var letter = String.fromCharCode(keycode);
 
+   console.log(letter);
+
    // That letter might not be a letter ... it could be the
    // the backspace key, or even the shift key, because 'keyup'
    // catches all kinds of keys.  (Also, the difference between
    // upper and lower case comes from state of shift key + key code,
    // so ignoring the shift key we get only the upper case letters.
 
-   if (! "ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(letter)) { return }
-    console.log(txt)
+    var backspaceWasPressed = keycode == 8;
+
+    // allow backspaces to update
+   if (! "ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(letter) && !backspaceWasPressed) { return }
+
+   txt = txt.toLowerCase();
+
    $.getJSON( "/_check", { text: txt }, 
               function(data) {
 
+                match = data.result.match;
                 response_message = data.result.response_message;
                 redirect_url = data.result.redirect_url;
 
-                if (response_message) {
-                    
+                if (redirect_url) {
+                    // https://stackoverflow.com/a/17252202
+                    window.location = redirect_url;
                 }
 
-                console.log("result: " + data.result.response_message);
-                checkWord(txt);
+                else if (match) {
+                    console.log(match);
+                    $("#matches").css('display','block'); // https://stackoverflow.com/a/15223278
+                    $(".message").hide();
+                    $("#results").append(match +" ");
+                }
+
+                if (response_message) {
+                    $(".message").show();
+                    $(".message").html(response_message);
+                }
                }
            );
    });
 
-function checkWord(text) {
-    text = text.toLowerCase();
-    console.log(text);
-}
-
 </script>
 <br />
+
+<p class="message"></p>
+
+<div id="matches">
+<h2>You found </h2>
+<p id="results">
+  
+</p>
+</div>
 
 {% if session.matches|length is not equalto 0  %}
 <h2>You found </h2>
@@ -151,14 +177,6 @@ function checkWord(text) {
 {% endif %}
 
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <!-- Mismatch, already found, etc. "flashed" from Python -->
-    {% for message in messages %}
-      <p class="message">{{ message }}</p>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
 
 
 

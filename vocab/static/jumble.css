@@ -13,3 +13,8 @@
 .message { 
     color: red;
 }
+
+/* start off with matches text hidden, we'll show it when we have some matches */
+#matches {
+    display: none;
+}
